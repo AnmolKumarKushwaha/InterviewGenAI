@@ -1,29 +1,31 @@
+# Environment variables
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+
 # Virtual Environment
 venv/
 
-# Python Cache
-__pycache__/
-*.pyc
+# Logs
+logs/
+*.log
 
-# Environment Variables
-.env
-
-# Uploaded Files
+# Uploaded files
 uploads/
 
 # IDE
 .vscode/
 .idea/
 
-# Logs
-*.log
+# OS
+.DS_Store
+Thumbs.db
 
 # Database
 *.db
 
-# Testing
-.pytest_cache/
-
-# OS Files
-.DS_Store
-Thumbs.db
+# Alembic cache
+alembic/versions/__pycache__/
