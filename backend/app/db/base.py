@@ -10,7 +10,12 @@ Purpose:
 """
 
 from sqlalchemy.orm import DeclarativeBase
+from app.db.database import Base
 
+# Import all models here
+from app.models.user import User
+from app.models.resume import Resume
+from app.models.interview import Interview
 
 class Base(DeclarativeBase):
     """
