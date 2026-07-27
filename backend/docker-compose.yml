@@ -1,0 +1,105 @@
+services:
+
+  # ==========================================================
+  # FastAPI Backend
+  # ==========================================================
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    container_name: interviewgenai_backend
+
+    ports:
+      - "8000:8000"
+
+    env_file:
+      - .env.docker
+
+    volumes:
+      - .:/app
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      qdrant:
+        condition: service_started
+
+    restart: unless-stopped
+
+  # ==========================================================
+  # PostgreSQL
+  # ==========================================================
+  postgres:
+    image: postgres:16
+
+    container_name: interviewgenai_postgres
+
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: interviewgenai
+
+    ports:
+      - "5432:5432"
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d interviewgenai"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+    restart: unless-stopped
+
+  # ==========================================================
+  # Redis
+  # ==========================================================
+  redis:
+    image: redis:7
+
+    container_name: interviewgenai_redis
+
+    ports:
+      - "6379:6379"
+
+    volumes:
+      - redis_data:/data
+
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+    restart: unless-stopped
+
+  # ==========================================================
+  # Qdrant
+  # ==========================================================
+  qdrant:
+    image: qdrant/qdrant:latest
+
+    container_name: interviewgenai_qdrant
+
+    ports:
+      - "6333:6333"
+      - "6334:6334"
+
+    volumes:
+      - qdrant_data:/qdrant/storage
+
+    restart: unless-stopped
+
+# ==========================================================
+# Persistent Volumes
+# ==========================================================
+
+volumes:
+  postgres_data:
+  redis_data:
+  qdrant_data:
