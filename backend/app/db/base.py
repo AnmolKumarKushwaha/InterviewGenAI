@@ -3,8 +3,8 @@
 File: base.py
 
 Purpose:
-    Defines the Base class that every database model
-    inherits from.
+    Defines the SQLAlchemy Declarative Base class.
+    Every ORM model inherits from this Base.
 
 =========================================================
 """
@@ -24,9 +24,6 @@ class Base(DeclarativeBase):
     Example:
 
         class User(Base):
-            ...
-
-        class Resume(Base):
             ...
 
     """
