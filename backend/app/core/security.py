@@ -3,95 +3,161 @@
 File: security.py
 
 Purpose:
-    Handles password hashing and JWT token management.
+    Handles password hashing, password verification,
+    JWT creation, JWT validation and OAuth2 configuration.
 
-Used by:
-    - Authentication
-    - Authorization
-    - Protected APIs
 =========================================================
 """
 
 from datetime import datetime, timedelta, timezone
+from typing import Any
 
 from jose import JWTError, jwt
-from pwdlib import PasswordHash
+from passlib.context import CryptContext
 
 from app.core.config import settings
 
 # ==========================================================
-# Password Hasher
+# Password Hashing
 # ==========================================================
 
-password_hash = PasswordHash.recommended()
+pwd_context = CryptContext(
+    schemes=["bcrypt"],
+    deprecated="auto",
+)
 
 # ==========================================================
-# Hash Password
+# JWT Configuration
 # ==========================================================
+
+SECRET_KEY = settings.SECRET_KEY
+ALGORITHM = settings.ALGORITHM
+
+ACCESS_TOKEN_EXPIRE_MINUTES = settings.ACCESS_TOKEN_EXPIRE_MINUTES
+REFRESH_TOKEN_EXPIRE_DAYS = 7
+
 
 def hash_password(password: str) -> str:
     """
-    Hash a plain text password before storing it.
+    Returns hashed password.
     """
-    return password_hash.hash(password)
 
+    return pwd_context.hash(password)
 
-# ==========================================================
-# Verify Password
-# ==========================================================
 
 def verify_password(
     plain_password: str,
     hashed_password: str,
 ) -> bool:
     """
-    Compare a plain password with its hashed version.
-    """
-    return password_hash.verify(plain_password, hashed_password)
-
-
-# ==========================================================
-# Create JWT Access Token
-# ==========================================================
-
-def create_access_token(subject: str) -> str:
-    """
-    Generate a JWT access token.
+    Verifies password.
     """
 
-    expire = datetime.now(timezone.utc) + timedelta(
-        minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES
+    return pwd_context.verify(
+        plain_password,
+        hashed_password,
     )
 
-    payload = {
-        "sub": subject,
-        "exp": expire,
-    }
+
+def create_access_token(
+    data: dict[str, Any],
+) -> str:
+    """
+    Creates Access Token.
+    """
+
+    payload = data.copy()
+
+    expire = (
+        datetime.now(timezone.utc)
+        + timedelta(
+            minutes=ACCESS_TOKEN_EXPIRE_MINUTES
+        )
+    )
+
+    payload.update(
+        {
+            "exp": expire,
+            "type": "access",
+        }
+    )
 
     return jwt.encode(
         payload,
-        settings.SECRET_KEY,
-        algorithm=settings.ALGORITHM,
+        SECRET_KEY,
+        algorithm=ALGORITHM,
     )
 
 
-# ==========================================================
-# Decode JWT
-# ==========================================================
-
-def decode_access_token(token: str) -> dict:
+def create_refresh_token(
+    data: dict[str, Any],
+) -> str:
     """
-    Decode and validate a JWT token.
+    Creates Refresh Token.
     """
 
-    try:
-        payload = jwt.decode(
-            token,
-            settings.SECRET_KEY,
-            algorithms=[settings.ALGORITHM],
+    payload = data.copy()
+
+    expire = (
+        datetime.now(timezone.utc)
+        + timedelta(
+            days=REFRESH_TOKEN_EXPIRE_DAYS
         )
+    )
 
-        return payload
+    payload.update(
+        {
+            "exp": expire,
+            "type": "refresh",
+        }
+    )
 
-    except JWTError as exc:
-        raise ValueError("Invalid or expired token.") from exc
+    return jwt.encode(
+        payload,
+        SECRET_KEY,
+        algorithm=ALGORITHM,
+    )
+
+
+def decode_token(
+    token: str,
+) -> dict[str, Any]:
+    """
+    Decodes JWT.
+    """
+
+    return jwt.decode(
+        token,
+        SECRET_KEY,
+        algorithms=[ALGORITHM],
+    )
+
+
+def verify_access_token(
+    token: str,
+) -> dict[str, Any]:
+    """
+    Validates Access Token.
+    """
+
+    payload = decode_token(token)
+
+    if payload.get("type") != "access":
+        raise JWTError("Invalid Access Token")
+
+    return payload
+
+
+def verify_refresh_token(
+    token: str,
+) -> dict[str, Any]:
+    """
+    Validates Refresh Token.
+    """
+
+    payload = decode_token(token)
+
+    if payload.get("type") != "refresh":
+        raise JWTError("Invalid Refresh Token")
+
+    return payload
