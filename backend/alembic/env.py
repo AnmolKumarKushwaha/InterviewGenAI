@@ -8,7 +8,10 @@ from app.core.config import settings
 from app.db.base import Base
 
 # Import all models
-from app.models import *
+from app.models.user import User
+from app.models.resume import Resume
+from app.models.resume_version import ResumeVersion
+from app.models.resume_analysis import ResumeAnalysis
 
 config = context.config
 
