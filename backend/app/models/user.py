@@ -18,6 +18,7 @@ from sqlalchemy import func
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
+from sqlalchemy.orm import relationship
 
 from app.db.base import Base
 
@@ -109,6 +110,12 @@ class User(Base):
     last_login: Mapped[datetime | None] = mapped_column(
         DateTime(timezone=True),
         nullable=True,
+    )
+    
+    resumes = relationship(
+        "Resume",
+        back_populates="user",
+        cascade="all, delete-orphan"
     )
 
     # =====================================================
