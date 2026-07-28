@@ -1,13 +1,26 @@
 """
-Main API Router
+=========================================================
+File: api.py
 
-Collects all API routes in one place.
+Purpose:
+    Central API router.
+    Registers all version 1 endpoints.
+
+=========================================================
 """
 
 from fastapi import APIRouter
 
-from app.api.v1.routes.health import router as health_router
+from app.api.v1.endpoints.auth import router as auth_router
+
 
 api_router = APIRouter()
 
-api_router.include_router(health_router)
+
+# ==========================================================
+# Authentication Routes
+# ==========================================================
+
+api_router.include_router(
+    auth_router,
+)
