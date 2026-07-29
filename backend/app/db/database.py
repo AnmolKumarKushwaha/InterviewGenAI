@@ -1,26 +1,36 @@
 """
 =========================================================
-File: database.py
+Database Engine Configuration
 
-Purpose:
-    Creates the SQLAlchemy Engine used to communicate
-    with the PostgreSQL database.
+Purpose
+-------
+Creates the SQLAlchemy Engine and Session Factory.
+
+Every database request in the project will use this engine.
 
 =========================================================
 """
 
 from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 
 from app.core.config import settings
-from app.core.logger import app_logger
+
+# ---------------------------------------------------------
+# SQLAlchemy Engine
+# ---------------------------------------------------------
 
 engine = create_engine(
     settings.DATABASE_URL,
-    pool_size=10,
-    max_overflow=20,
-    pool_recycle=1800,
-    pool_pre_ping=True,
-    echo=False,
+    echo=settings.DEBUG,
 )
 
-app_logger.info("PostgreSQL Engine initialized successfully.")
+# ---------------------------------------------------------
+# Session Factory
+# ---------------------------------------------------------
+
+SessionLocal = sessionmaker(
+    autocommit=False,
+    autoflush=False,
+    bind=engine,
+)
