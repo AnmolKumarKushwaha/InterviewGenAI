@@ -54,6 +54,10 @@ class Settings(BaseSettings):
     SECRET_KEY: str
     ALGORITHM: str
     ACCESS_TOKEN_EXPIRE_MINUTES: int
+    
+    
+    UPLOAD_DIRECTORY: str
+    MAX_FILE_SIZE: int
 
     # =====================================================
     # OpenAI
