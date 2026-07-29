@@ -9,6 +9,7 @@ Purpose:
 
 from pathlib import Path
 import re
+from fastapi import HTTPException
 
 from app.core.constants import (
     ALLOWED_RESUME_EXTENSIONS,
@@ -101,3 +102,28 @@ def validate_job_description_extension(
     """
 
     return validate_resume_extension(filename)
+
+
+# ==========================================================
+# Resume Upload Validation
+# ==========================================================
+
+def validate_resume_file(
+    filename: str,
+    file_size: int,
+) -> None:
+    """
+    Validates uploaded resume.
+    """
+
+    if not validate_resume_extension(filename):
+        raise HTTPException(
+            status_code=400,
+            detail="Only PDF and DOCX files are allowed.",
+        )
+
+    if not validate_file_size(file_size):
+        raise HTTPException(
+            status_code=400,
+            detail="File exceeds maximum allowed size.",
+        )

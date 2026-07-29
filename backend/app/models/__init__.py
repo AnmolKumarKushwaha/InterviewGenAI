@@ -1,11 +1,2 @@
-"""
-=========================================================
-Models Package
-=========================================================
-"""
-
 from app.models.user import User
-
-__all__ = [
-    "User",
-]
+from app.models.resume import Resume

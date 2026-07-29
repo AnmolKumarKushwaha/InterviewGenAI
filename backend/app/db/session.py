@@ -1,42 +1,24 @@
 """
 =========================================================
-File: session.py
-
-Purpose:
-    Creates database sessions for every API request.
-
+Database Session Dependency
 =========================================================
 """
 
-from sqlalchemy.orm import sessionmaker, Session
+from collections.abc import Generator
 
-from app.db.database import engine
+from sqlalchemy.orm import Session
 
-# ==========================================================
-# Session Factory
-# ==========================================================
-
-SessionLocal = sessionmaker(
-    bind=engine,
-    autoflush=False,
-    autocommit=False,
-    expire_on_commit=False,
-)
+from app.db.database import SessionLocal
 
 
-def get_db():
-    """
-    FastAPI dependency.
+def get_db() -> Generator[Session, None, None]:
 
-    Creates a new database session for every request
-    and closes it automatically after the request
-    completes.
-    """
-
-    db: Session = SessionLocal()
+    db = SessionLocal()
 
     try:
+
         yield db
 
     finally:
+
         db.close()

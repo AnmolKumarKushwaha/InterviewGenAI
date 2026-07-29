@@ -3,39 +3,28 @@
 File: auth_service.py
 
 Purpose:
-    Contains authentication business logic.
+    Handles all authentication business logic.
+
 =========================================================
 """
 
-from datetime import datetime, timezone
-
-from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.models.user import User
-
 from app.repositories.user_repository import UserRepository
-
-from app.core.security import (
-    hash_password,
-    verify_password,
-    create_access_token,
-    create_refresh_token,
-    verify_refresh_token,
-)
+from app.schemas.user import UserCreate
+from app.security.hashing import hash_password
+from app.security.hashing import verify_password
+from app.security.jwt import create_access_token
 
 
 class AuthService:
-
 
     def __init__(
         self,
         db: Session,
     ):
-
         self.user_repository = UserRepository(db)
-
-
 
     # =====================================================
     # Register User
@@ -43,65 +32,28 @@ class AuthService:
 
     def register_user(
         self,
-        full_name: str,
-        username: str,
-        email: str,
-        password: str,
+        user_data: UserCreate,
     ):
 
-
-        existing_email = (
-            self.user_repository
-            .get_by_email(email)
+        existing_user = self.user_repository.get_by_email(
+            user_data.email,
         )
 
+        if existing_user:
 
-        if existing_email:
-
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Email already registered",
+            raise ValueError(
+                "Email already registered."
             )
-
-
-
-        existing_username = (
-            self.user_repository
-            .get_by_username(username)
-        )
-
-
-        if existing_username:
-
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Username already taken",
-            )
-
-
 
         user = User(
-
-            full_name=full_name,
-
-            username=username,
-
-            email=email,
-
-            hashed_password=hash_password(password),
-
-            role="user",
-
-            is_active=True,
-
-            is_verified=False,
+            full_name=user_data.full_name,
+            email=user_data.email,
+            hashed_password=hash_password(
+                user_data.password,
+            ),
         )
 
-
-
         return self.user_repository.create(user)
-
-
 
     # =====================================================
     # Login User
@@ -113,117 +65,30 @@ class AuthService:
         password: str,
     ):
 
-
-        user = (
-            self.user_repository
-            .get_by_email(email)
+        user = self.user_repository.get_by_email(
+            email,
         )
 
+        if user is None:
 
-
-        if not user:
-
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid email or password",
+            raise ValueError(
+                "Invalid email or password."
             )
 
-
-
-        password_valid = verify_password(
+        if not verify_password(
             password,
             user.hashed_password,
-        )
+        ):
 
-
-
-        if not password_valid:
-
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid email or password",
+            raise ValueError(
+                "Invalid email or password."
             )
-
-
-
-        # Update last login
-
-        user.last_login = datetime.now(
-            timezone.utc
-        )
-
-
-        self.user_repository.update(user)
-
-
 
         access_token = create_access_token(
             {
-                "sub": str(user.id)
+                "sub": user.email,
+                "user_id": str(user.id),
             }
         )
 
-
-        refresh_token = create_refresh_token(
-            {
-                "sub": str(user.id)
-            }
-        )
-
-
-
-        return {
-
-            "access_token": access_token,
-
-            "refresh_token": refresh_token,
-
-            "token_type": "bearer",
-        }
-
-
-
-    # =====================================================
-    # Refresh Token
-    # =====================================================
-
-    def refresh_access_token(
-        self,
-        refresh_token: str,
-    ):
-
-
-        payload = verify_refresh_token(
-            refresh_token
-        )
-
-
-        user_id = payload.get(
-            "sub"
-        )
-
-
-
-        if not user_id:
-
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid refresh token",
-            )
-
-
-
-        access_token = create_access_token(
-            {
-                "sub": user_id
-            }
-        )
-
-
-
-        return {
-
-            "access_token": access_token,
-
-            "token_type": "bearer",
-        }
+        return access_token
