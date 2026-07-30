@@ -18,6 +18,7 @@ from fastapi import HTTPException
 from app.repositories.resume_repository import ResumeRepository
 from app.schemas.resume_analysis import ResumeAnalysisResponse
 from app.schemas.resume_history import ResumeHistoryResponse
+from fastapi.responses import FileResponse
 
 router = APIRouter(
     prefix="/resumes",
@@ -135,6 +136,33 @@ def delete_resume(
     )
 
     return service.delete_resume(
+        resume_id,
+        current_user,
+    )
+    
+    
+@router.get(
+    "/download/{resume_id}",
+)
+def download_resume(
+
+    resume_id: str,
+
+    db: Session = Depends(
+        get_db,
+    ),
+
+    current_user: User = Depends(
+        get_current_user,
+    ),
+
+):
+
+    service = ResumeService(
+        db,
+    )
+
+    return service.download_resume(
         resume_id,
         current_user,
     )
