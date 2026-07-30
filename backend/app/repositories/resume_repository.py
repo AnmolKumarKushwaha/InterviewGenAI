@@ -66,3 +66,4 @@ class ResumeRepository:
         self.db.refresh(resume)
 
         return resume
+    

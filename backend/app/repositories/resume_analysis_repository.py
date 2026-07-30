@@ -40,3 +40,26 @@ class ResumeAnalysisRepository:
             )
             .first()
     )
+        
+    
+    def get_scores(
+        self,
+        resume_ids: list[str],
+    ):
+
+        analyses = (
+            self.db.query(
+                ResumeAnalysis,
+            )
+            .filter(
+                ResumeAnalysis.resume_id.in_(
+                    resume_ids,
+                ),
+            )
+            .all()
+        )
+
+        return {
+                analysis.resume_id: analysis.resume_score
+                for analysis in analyses
+        }
