@@ -56,6 +56,11 @@ class ResumeAnalysis(Base):
         default=0,
     )
 
+    score_breakdown: Mapped[dict | None] = mapped_column(
+        JSON,
+        nullable=True,
+    )
+    
     missing_skills: Mapped[list] = mapped_column(
         JSON,
         default=list,
@@ -66,11 +71,6 @@ class ResumeAnalysis(Base):
         default=list,
     )
 
-    resume = relationship(
-        "Resume",
-        back_populates="analysis",
-    )
-    
     resume = relationship(
         "Resume",
         back_populates="analysis",

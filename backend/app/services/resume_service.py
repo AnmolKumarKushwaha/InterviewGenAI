@@ -20,6 +20,7 @@ from app.utils.text_cleaner import TextCleaner
 from app.schemas.resume_history import ResumeHistoryResponse
 import os
 from fastapi.responses import FileResponse
+from app.ai.scoring.ats_score import ATSScore
 
 
 class ResumeService:
@@ -103,6 +104,8 @@ class ResumeService:
         print("Gemini Response")
         print(analysis)
         print("=" * 60)
+        
+        ats = ATSScore.calculate(analysis, text,)
 
         analysis_record = ResumeAnalysis(
 
@@ -116,7 +119,9 @@ class ResumeService:
 
             extracted_education=analysis["education"],
 
-            resume_score=analysis["resume_score"],
+            resume_score=ats["score"],
+
+            score_breakdown=ats["breakdown"],
 
             missing_skills=analysis["missing_skills"],
 
