@@ -58,6 +58,10 @@ class ResumeService:
         
         print("Cleaned text length:", len(text))
         
+        self.repository.mark_old_versions(
+            current_user.id,
+        )
+        
         
         resume = Resume(
 

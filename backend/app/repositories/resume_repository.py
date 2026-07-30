@@ -79,4 +79,46 @@ class ResumeRepository:
             )
         
         self.db.commit()
+        
     
+    
+    def mark_old_versions(
+        self,
+        user_id: int,
+    ):
+
+       (
+           self.db.query(
+                Resume,
+            )
+            .filter(
+                Resume.user_id == user_id,
+            )
+            .update(
+                {
+                    Resume.is_latest: False,
+                },
+                synchronize_session=False,
+            )
+        )
+
+       self.db.commit()
+       
+    
+    
+    def get_latest_resume(
+        self,
+        user_id: int,
+    ):
+
+        return (
+            self.db.query(
+                Resume,
+            )
+            .filter(
+                Resume.user_id == user_id,
+                Resume.is_latest == True,
+            )
+            .first()
+        )
+      

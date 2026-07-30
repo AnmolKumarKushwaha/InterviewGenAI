@@ -13,6 +13,7 @@ from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
 
 from app.db.base import Base
+from sqlalchemy import Boolean
 
 
 class Resume(Base):
@@ -59,32 +60,27 @@ class Resume(Base):
         DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc),
     )
-
+    
+    extracted_text: Mapped[str | None] = mapped_column(
+        Text,
+        nullable=True,
+    )
+    
+    is_latest: Mapped[bool] = mapped_column(
+        Boolean,
+        default=True,
+        nullable=False,
+    )
+    
+    
     user = relationship(
         "User",
         back_populates="resumes",
     )
-    
-    extracted_text: Mapped[str | None] = mapped_column(
-    Text,
-    nullable=True,
-    )
-    
-
 
     analysis = relationship(
         "ResumeAnalysis",
         back_populates="resume",
         uselist=False,
-        cascade="all, delete-orphan",
-    )
-    
-    analysis = relationship(
-        "ResumeAnalysis",
-
-        back_populates="resume",
-
-        uselist=False,
-
         cascade="all, delete-orphan",
     )
