@@ -17,6 +17,8 @@ from app.utils.file_validator import FileValidator
 from app.extractors.extractor import ResumeExtractor
 from app.utils.text_cleaner import TextCleaner
 
+from app.schemas.resume_history import ResumeHistoryResponse
+
 class ResumeService:
 
     def __init__(
@@ -140,5 +142,46 @@ class ResumeService:
             )
 
         return analysis
+    
+    
+    def get_user_resumes(
+        self,
+        user: User,
+    ):
+
+        resumes = self.repository.get_user_resumes(
+            user.id,
+        )
+
+        resume_ids = [
+            resume.id
+            for resume in resumes
+        ]
         
-            
+        scores = (
+            self.analysis_repository.get_scores(
+                resume_ids,
+            )
+        )
+
+        response = []
+
+        for resume in resumes:
+        
+                response.append(
+        
+                    ResumeHistoryResponse(
+        
+                        id=resume.id,
+        
+                        original_filename=resume.original_filename,
+        
+                        created_at=resume.created_at,
+        
+                        resume_score=scores.get(
+                            resume.id,
+                        ),
+                    )
+                )
+        
+        return response

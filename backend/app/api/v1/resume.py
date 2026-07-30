@@ -17,6 +17,7 @@ from fastapi import HTTPException
 
 from app.repositories.resume_repository import ResumeRepository
 from app.schemas.resume_analysis import ResumeAnalysisResponse
+from app.schemas.resume_history import ResumeHistoryResponse
 
 router = APIRouter(
     prefix="/resumes",
@@ -84,4 +85,28 @@ def get_resume_analysis(
 
     return service.get_analysis(
         resume_id,
+    )
+    
+    
+    
+@router.get(
+    "",
+    response_model=list[ResumeHistoryResponse],
+)
+def get_user_resumes(
+
+    db: Session = Depends(get_db),
+
+    current_user: User = Depends(
+        get_current_user,
+    ),
+
+):
+
+    service = ResumeService(
+        db,
+    )
+
+    return service.get_user_resumes(
+        current_user,
     )
