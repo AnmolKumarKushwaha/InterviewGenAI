@@ -110,3 +110,31 @@ def get_user_resumes(
     return service.get_user_resumes(
         current_user,
     )
+    
+    
+    
+@router.delete(
+    "/{resume_id}",
+)
+def delete_resume(
+
+    resume_id: str,
+
+    db: Session = Depends(
+        get_db,
+    ),
+
+    current_user: User = Depends(
+        get_current_user,
+    ),
+
+):
+
+    service = ResumeService(
+        db,
+    )
+
+    return service.delete_resume(
+        resume_id,
+        current_user,
+    )
