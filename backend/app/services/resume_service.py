@@ -19,6 +19,7 @@ from app.utils.text_cleaner import TextCleaner
 
 from app.schemas.resume_history import ResumeHistoryResponse
 import os
+from fastapi.responses import FileResponse
 
 
 class ResumeService:
@@ -228,3 +229,36 @@ class ResumeService:
         return {
             "message": "Resume deleted successfully.",
         }
+        
+    def download_resume(
+        self,
+        resume_id: str,
+        current_user: User,
+    ):
+        
+        resume = self.repository.get_by_id(
+            resume_id,
+        )
+        
+        if resume is None:
+
+            raise HTTPException(
+                status_code=404,
+                detail="Resume not found.",
+            )
+
+        if resume.user_id != current_user.id:
+
+            raise HTTPException(
+                status_code=403,
+                detail="Not authorized.",
+            )
+
+        return FileResponse(
+
+            path=resume.file_path,
+
+            filename=resume.original_filename,
+
+            media_type=resume.mime_type,
+        )
