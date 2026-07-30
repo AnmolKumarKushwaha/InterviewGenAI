@@ -7,6 +7,8 @@ class ResumeAnalysisResponse(BaseModel):
     
     resume_score: int
     
+    score_breakdown: dict
+    
     extracted_skills: list
 
     extracted_projects: list
