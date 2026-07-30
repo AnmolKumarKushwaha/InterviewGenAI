@@ -18,6 +18,8 @@ from app.extractors.extractor import ResumeExtractor
 from app.utils.text_cleaner import TextCleaner
 
 from app.schemas.resume_history import ResumeHistoryResponse
+import os
+
 
 class ResumeService:
 
@@ -185,3 +187,44 @@ class ResumeService:
                 )
         
         return response
+    
+    
+    def delete_resume(
+        self,
+        resume_id: str,
+        current_user: User,
+    ):
+
+        resume = self.repository.get_by_id(
+            resume_id,
+        )
+
+        if resume is None:
+        
+            raise HTTPException(
+                status_code=404,
+                detail="Resume not found.",
+            )
+
+        if resume.user_id != current_user.id:
+        
+            raise HTTPException(
+                status_code=403,
+                detail="Not authorized.",
+            )
+
+        if os.path.exists(
+            resume.file_path,
+        ):
+
+            os.remove(
+                resume.file_path,
+            )
+
+        self.repository.delete(
+            resume,
+        )
+
+        return {
+            "message": "Resume deleted successfully.",
+        }

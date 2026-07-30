@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 
 from app.models.resume import Resume
+import os
 
 
 class ResumeRepository:
@@ -66,4 +67,16 @@ class ResumeRepository:
         self.db.refresh(resume)
 
         return resume
+    
+    
+    def delete(
+        self,
+        resume: Resume,
+    ):
+
+        self.db.delete(
+                resume,
+            )
+        
+        self.db.commit()
     

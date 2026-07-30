@@ -70,3 +70,8 @@ class ResumeAnalysis(Base):
         "Resume",
         back_populates="analysis",
     )
+    
+    resume = relationship(
+        "Resume",
+        back_populates="analysis",
+    )
