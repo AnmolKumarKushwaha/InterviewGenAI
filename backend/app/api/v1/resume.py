@@ -16,6 +16,7 @@ from app.extractors.extractor import ResumeExtractor
 from fastapi import HTTPException
 
 from app.repositories.resume_repository import ResumeRepository
+from app.schemas.resume_analysis import ResumeAnalysisResponse
 
 router = APIRouter(
     prefix="/resumes",
@@ -66,3 +67,21 @@ def extract_resume(
         "characters": len(text),
         "preview": text[:1000],
     }
+    
+    
+@router.get(
+    "/analysis/{resume_id}",
+    response_model=ResumeAnalysisResponse,
+)
+def get_resume_analysis(
+    resume_id: str,
+    db: Session = Depends(get_db),
+):
+
+    service = ResumeService(
+        db,
+    )
+
+    return service.get_analysis(
+        resume_id,
+    )

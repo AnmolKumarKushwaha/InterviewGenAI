@@ -69,3 +69,12 @@ class Resume(Base):
     Text,
     nullable=True,
     )
+    
+
+
+    analysis = relationship(
+        "ResumeAnalysis",
+        back_populates="resume",
+        uselist=False,
+        cascade="all, delete-orphan",
+    )
