@@ -82,3 +82,9 @@ class User(Base):
     back_populates="user",
     cascade="all, delete-orphan",
     )
+    
+    
+    job_descriptions = relationship(
+    "JobDescription",
+    back_populates="user",
+    )
