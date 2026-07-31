@@ -30,8 +30,11 @@ class ResumeAnalysisRepository:
         resume_id: str,
     
     ):
+        
+        print("=" * 60)
+        print("Searching Resume ID:", repr(resume_id))
 
-        return (
+        analysis = (
              self.db.query(
                 ResumeAnalysis,
             )
@@ -39,7 +42,12 @@ class ResumeAnalysisRepository:
                 ResumeAnalysis.resume_id == resume_id,
             )
             .first()
-    )
+            
+        )
+        print("Query Result:", analysis)
+        print("=" * 60)
+            
+        return analysis
         
     
     def get_scores(

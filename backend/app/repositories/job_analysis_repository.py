@@ -32,8 +32,11 @@ class JobAnalysisRepository:
         self,
         job_id: str,
     ):
+        
+        print("=" * 60)
+        print("Searching Job ID:", repr(job_id))
 
-        return (
+        analysis = (
             self.db.query(
                 JobAnalysis,
             )
@@ -42,3 +45,8 @@ class JobAnalysisRepository:
             )
             .first()
         )
+        
+        print("Query Result:", analysis)
+        print("=" * 60)
+        
+        return analysis
