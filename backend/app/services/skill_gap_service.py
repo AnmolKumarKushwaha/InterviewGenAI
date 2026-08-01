@@ -10,7 +10,7 @@ from app.repositories.job_analysis_repository import JobAnalysisRepository
 from app.repositories.skill_gap_repository import SkillGapRepository
 from app.ai.explanation_generator import ExplanationGenerator
 from app.ai.roadmap_generator import RoadmapGenerator
-
+from app.ai.interview_generator import InterviewGenerator
 
 class SkillGapService:
 
@@ -93,6 +93,19 @@ class SkillGapService:
             skill_explanations=skill_explanations,
         )
         
+        interview_preparation = InterviewGenerator.generate(
+
+            resume_skills=resume.extracted_skills,
+
+            missing_skills=result["missing_skills"],
+
+            learning_priorities=result["learning_priorities"],
+
+            skill_explanations=skill_explanations,
+
+            learning_roadmap=roadmap,
+        )
+        
         gap = SkillGap(
 
             resume_id=resume_id,
@@ -122,6 +135,8 @@ class SkillGapService:
             skill_explanations=skill_explanations,
             
             learning_roadmap=roadmap,
+            
+            interview_preparation=interview_preparation,
         )
 
         print("=" * 60)

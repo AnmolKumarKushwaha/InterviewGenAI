@@ -105,6 +105,12 @@ class SkillGap(Base):
         nullable=True,
         default=list,
     )
+    
+    interview_preparation = Column(
+        JSON,
+        nullable=True,
+        default=list,
+    )
 
     resume = relationship(
         "Resume",
