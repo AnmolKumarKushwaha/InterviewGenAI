@@ -111,7 +111,14 @@ class SkillGap(Base):
         nullable=True,
         default=list,
     )
-
+    
+    
+    career_report = Column(
+        JSON,
+        nullable=True,
+        default=list,
+    )
+    
     resume = relationship(
         "Resume",
     )
