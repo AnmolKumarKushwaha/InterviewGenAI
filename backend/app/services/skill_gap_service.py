@@ -8,6 +8,8 @@ from app.models.skill_gap import SkillGap
 from app.repositories.resume_analysis_repository import ResumeAnalysisRepository
 from app.repositories.job_analysis_repository import JobAnalysisRepository
 from app.repositories.skill_gap_repository import SkillGapRepository
+from app.ai.explanation_generator import ExplanationGenerator
+from app.ai.roadmap_generator import RoadmapGenerator
 
 
 class SkillGapService:
@@ -78,6 +80,19 @@ class SkillGapService:
         print(result)
         print("=" * 60)
         
+        skill_explanations = ExplanationGenerator.generate(result["missing_skills"],)
+        
+        roadmap = RoadmapGenerator.generate(
+
+            resume_skills=resume.extracted_skills,
+
+            missing_skills=result["missing_skills"],
+
+            learning_priorities=result["learning_priorities"],
+
+            skill_explanations=skill_explanations,
+        )
+        
         gap = SkillGap(
 
             resume_id=resume_id,
@@ -91,6 +106,10 @@ class SkillGapService:
             missing_skills=result["missing_skills"],
             
             semantic_matches=result["semantic_matches"],
+            
+            matched_weight=result["matched_weight"],
+            
+            total_weight=result["total_weight"],
 
             learning_recommendations=result[
                 "learning_recommendations"
@@ -99,6 +118,10 @@ class SkillGapService:
             ai_feedback=result["ai_feedback"],
             
             learning_priorities=result["learning_priorities"],
+            
+            skill_explanations=skill_explanations,
+            
+            learning_roadmap=roadmap,
         )
 
         print("=" * 60)
