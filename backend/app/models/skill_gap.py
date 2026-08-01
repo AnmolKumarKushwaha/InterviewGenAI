@@ -93,6 +93,18 @@ class SkillGap(Base):
         nullable=False,
         default=list,
     )
+    
+    skill_explanations = Column(
+        JSON,
+        nullable=False,
+        default=list,
+    )
+    
+    learning_roadmap = Column(
+        JSON,
+        nullable=True,
+        default=list,
+    )
 
     resume = relationship(
         "Resume",

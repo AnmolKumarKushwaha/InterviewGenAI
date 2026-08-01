@@ -1,28 +1,17 @@
-from google import genai
-
-from app.core.config import settings
+from app.ai.llms.gemini_llm import llm
 
 
 class GeminiProvider:
-
-    def __init__(self):
-
-        self.client = genai.Client(
-            api_key=settings.GEMINI_API_KEY,
-        )
 
     def generate(
         self,
         prompt: str,
     ) -> str:
 
-        response = self.client.models.generate_content(
-            model="gemini-2.5-flash",
-            contents=prompt,
-        )
-        
-        print("=" * 60)
-        print(response.text)
-        print("=" * 60)
+        response = llm.invoke(prompt)
 
-        return response.text
+        print("=" * 60)
+        print(response)
+        print("=" * 60)
+        
+        return response.content

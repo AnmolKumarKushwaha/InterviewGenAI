@@ -4,6 +4,7 @@ from app.ai.semantic_matcher import SemanticMatcher
 from app.ai.skill_weights import SKILL_WEIGHTS
 from app.ai.feedback_generator import FeedbackGenerator
 from app.ai.priority_generator import PriorityGenerator
+from app.ai.skill_explainer import SkillExplainer
 
 class SkillGapAnalyzer:
 
@@ -74,6 +75,10 @@ class SkillGapAnalyzer:
         priorities = PriorityGenerator.generate(
             missing,
         )
+        
+        skill_explanations = SkillExplainer.generate(
+            missing,
+        )
 
         return {
 
@@ -99,4 +104,6 @@ class SkillGapAnalyzer:
             "learning_priorities": priorities,
             
             "ai_feedback": feedback,
+            
+            "skill_explanations": skill_explanations,
         }

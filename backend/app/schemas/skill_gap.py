@@ -20,6 +20,18 @@ class LearningPriority(BaseModel):
     priority: str
     
     
+class SkillExplanation(BaseModel):
+
+    skill: str
+
+    importance: str
+
+    priority: str
+    
+    resource: str
+
+    learning_time: str
+    
     
 
 class SkillGapResponse(BaseModel):
@@ -41,6 +53,10 @@ class SkillGapResponse(BaseModel):
     learning_priorities: list[LearningPriority]
     
     ai_feedback: str
+    
+    skill_explanations: list[SkillExplanation]
+    
+    learning_roadmap: dict
 
     class Config:
 
