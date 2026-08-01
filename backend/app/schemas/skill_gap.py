@@ -57,6 +57,8 @@ class SkillGapResponse(BaseModel):
     skill_explanations: list[SkillExplanation]
     
     learning_roadmap: dict
+    
+    career_report: dict
 
     class Config:
 
